@@ -4,15 +4,11 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# Enable CORS for all routes
-CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow all origins for testing
+# Allow all origins for development (Caution: restrict in production)
+CORS(app, resources={r"/api/*": {"origins": "*", "allow_headers": "*", "methods": ["GET", "POST", "OPTIONS"]}})
 
-@app.route('/api/vsco', methods=['GET', 'OPTIONS'])  # Allow both GET and OPTIONS
+@app.route('/api/vsco', methods=['GET'])
 def fetch_vsco_user_media():
-    # Handle OPTIONS request
-    if request.method == 'OPTIONS':
-        return '', 200  # CORS preflight response
-
     username = request.args.get('username')
 
     if not username:
@@ -20,7 +16,7 @@ def fetch_vsco_user_media():
 
     site_url = f'https://vsco.co/api/2.0/sites?subdomain={username}'
     headers = {
-        'Authorization': 'Bearer YOUR_ACCESS_TOKEN',  # Use an environment variable for the token
+        'Authorization': 'Bearer 7356455548d0a1d886db010883388d08be84d0c9',
         'User-Agent': 'vsco-get',
     }
 
