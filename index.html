@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VSCO Media Fetcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        #media-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        img {
+            margin: 10px;
+            width: 200px; /* Adjust as necessary */
+            height: auto; /* Maintain aspect ratio */
+        }
+    </style>
+</head>
+<body>
+    <h1>Fetch VSCO Media</h1>
+    <input type="text" id="username" placeholder="Enter VSCO username" />
+    <button onclick="fetchMedia()">Fetch Media</button>
+    <div id="media-container"></div>
+
+    <script>
+        async function fetchMedia() {
+            const username = document.getElementById('username').value;
+            try {
+                const response = await fetch(`http://localhost:5000/api/vsco?username=${username}`, {
+                    method: 'GET', // Specify the request method
+                    mode: 'cors',  // Make sure the mode is set to 'cors'
+                    headers: {
+                        'Content-Type': 'application/json' // Specify the content type
+                    }
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+                displayMedia(data.media);
+            } catch (error) {
+                console.error('Error fetching media:', error);
+                alert('Error fetching media: ' + error.message);
+            }
+        }
+
+        function displayMedia(mediaItems) {
+            const mediaContainer = document.getElementById('media-container');
+            mediaContainer.innerHTML = ''; // Clear previous media
+
+            if (!mediaItems || mediaItems.length === 0) {
+                mediaContainer.innerHTML = '<p>No media found.</p>';
+                return;
+            }
+
+            mediaItems.forEach(item => {
+                const imgElement = document.createElement('img');
+                imgElement.src = item.responsive_url.startsWith('http') ? item.responsive_url : 'https://' + item.responsive_url; // Ensure this is a valid URL
+                imgElement.alt = item.description || 'Media image';
+                mediaContainer.appendChild(imgElement);
+            });
+        }
+    </script>
+</body>
+</html>
